@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="UseCase7_CreateQrispDeploymentAndRunIBM" name="UseCase7_CreateQrispDeploymentAndRunIBM" isExecutable="true" camunda:historyTimeToLive="1">
+    <bpmn2:startEvent id="StartEvent_1">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="programs" label="Quantum Circuit" type="string" defaultValue="Circuit().h(0).cnot(0, 1)" />
+          <camunda:formField id="language" label="AssemblerLanguage" type="string" defaultValue="QASM" />
+          <camunda:formField id="input_name" label="DeploymentName" type="string" defaultValue="QunicornTestProgram" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1n1w1w9</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:endEvent id="Event_0b74xv7">
+      <bpmn2:incoming>Flow_0mh5wuy</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:serviceTask id="Activity_19lnvs0" name="Create Deployment" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">http://localhost:5005/deployments/</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
+println("Start Building Request");
+def programs = [[
+    "quantumCircuit":"circuit = QuantumCircuit(2, 2, name = \"fan out\");circuit.h(0);circuit.cx(0, range(1,2));circuit.measure(range(0,2), range(0,2))",
+   	"assemblerLanguage": "QRISP",
+   	"pythonFilePath": "ibm_upload_test_data_file.py (Note: this is an experimental feature for IBM_UPLOAD job type)",
+   	"pythonFileMetadata": "ibm_upload_test_data_metadata.json (Note: this is an experimental feature for IBM_UPLOAD job type)"
+]];
+def name = input_name;
+
+def request = [:];
+request.put("programs", programs);
+request.put("name", name);
+requeststring = new JsonBuilder(request).toPrettyString()
+println(requeststring);
+return requeststring;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="deployment_id">
+              <camunda:script scriptFormat="groovy">def resp = connector.getVariable("response");
+resp = new groovy.json.JsonSlurper().parseText(resp)
+println("The response was:")
+println(resp);
+return resp.get("id");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1n1w1w9</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1kejtan</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="Activity_0tnmbeu" name="Create Job" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">http://localhost:5005/jobs/</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
+println("Start Building Request");
+
+def parameters= [0];
+
+def request = [:];
+request.put("name", "UseCaseJobName");
+request.put("providerName", "IBM");
+request.put("deviceName", "aer_simulator");
+request.put("parameters", parameters);
+request.put("shots", 4000);
+request.put("token", "");
+request.put("type", "RUNNER");
+request.put("deploymentId", deployment_id);
+
+requeststring = new JsonBuilder(request).toPrettyString()
+println(requeststring);
+return requeststring;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="job_id">
+              <camunda:script scriptFormat="groovy">def resp = connector.getVariable("response");
+resp = new groovy.json.JsonSlurper().parseText(resp)
+println("The response id was:")
+println(resp.get("id"));
+return resp.get("id");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1kejtan</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1buzhn3</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:userTask id="Activity_1a5sblu" name="Show Job Results">
+      <bpmn2:extensionElements>
+        <camunda:inputOutput />
+        <camunda:formData>
+          <camunda:formField id="job_result_final" label="Check the Job Results:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1s4eiv3</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0mh5wuy</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="Activity_1uj1sge" name="Get Job">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">println("Build the IP for get Job")
+return "http://localhost:5005/jobs/" + job_id</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:outputParameter name="job_result_final">
+              <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");
+resp = new groovy.json.JsonSlurper().parseText(resp)
+print("Final Result is:")
+println(resp)
+return "http://localhost:5005/jobs/"+ resp.get("id");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1a751gb</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1s4eiv3</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:intermediateCatchEvent id="Event_0grvjc0" name="Wait For Job Completion">
+      <bpmn2:incoming>Flow_1buzhn3</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1a751gb</bpmn2:outgoing>
+      <bpmn2:timerEventDefinition id="TimerEventDefinition_07k73ag">
+        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">PT2S</bpmn2:timeDuration>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:intermediateCatchEvent>
+    <bpmn2:sequenceFlow id="Flow_1n1w1w9" sourceRef="StartEvent_1" targetRef="Activity_19lnvs0" />
+    <bpmn2:sequenceFlow id="Flow_0mh5wuy" sourceRef="Activity_1a5sblu" targetRef="Event_0b74xv7" />
+    <bpmn2:sequenceFlow id="Flow_1kejtan" sourceRef="Activity_19lnvs0" targetRef="Activity_0tnmbeu" />
+    <bpmn2:sequenceFlow id="Flow_1buzhn3" sourceRef="Activity_0tnmbeu" targetRef="Event_0grvjc0" />
+    <bpmn2:sequenceFlow id="Flow_1s4eiv3" sourceRef="Activity_1uj1sge" targetRef="Activity_1a5sblu" />
+    <bpmn2:sequenceFlow id="Flow_1a751gb" sourceRef="Event_0grvjc0" targetRef="Activity_1uj1sge" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UseCase7_CreateQrispDeploymentAndRunIBM">
+      <bpmndi:BPMNShape id="BPMNShape_00hzykb" bpmnElement="StartEvent_1">
+        <dc:Bounds x="402" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0aztrj9" bpmnElement="Event_0b74xv7">
+        <dc:Bounds x="1542" y="472" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1t3yhha" bpmnElement="Activity_19lnvs0">
+        <dc:Bounds x="500" y="450" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0dhos0i" bpmnElement="Activity_0tnmbeu">
+        <dc:Bounds x="770" y="450" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_06ziqyu" bpmnElement="Activity_1a5sblu">
+        <dc:Bounds x="1350" y="450" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_01izsu1" bpmnElement="Activity_1uj1sge">
+        <dc:Bounds x="1140" y="450" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_18n6i4z" bpmnElement="Event_0grvjc0">
+        <dc:Bounds x="1012" y="472" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="999" y="515" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_0qdnvj8" bpmnElement="Flow_1n1w1w9">
+        <di:waypoint x="438" y="490" />
+        <di:waypoint x="500" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0w6ihme" bpmnElement="Flow_0mh5wuy">
+        <di:waypoint x="1450" y="490" />
+        <di:waypoint x="1542" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_0i2h6r1" bpmnElement="Flow_1kejtan">
+        <di:waypoint x="600" y="490" />
+        <di:waypoint x="770" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1buzhn3_di" bpmnElement="Flow_1buzhn3">
+        <di:waypoint x="870" y="490" />
+        <di:waypoint x="1012" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_1m7g6mb" bpmnElement="Flow_1s4eiv3">
+        <di:waypoint x="1240" y="490" />
+        <di:waypoint x="1350" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_096jpd4" bpmnElement="Flow_1a751gb">
+        <di:waypoint x="1048" y="490" />
+        <di:waypoint x="1140" y="490" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
