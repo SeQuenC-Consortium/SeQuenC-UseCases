@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="UseCase4" name="UseCase4" isExecutable="true" camunda:versionTag="1.0" camunda:historyTimeToLive="1">
+    <bpmn2:endEvent id="Event_0pxzspo" name="End">
+      <bpmn2:incoming>Flow_07zhnu6</bpmn2:incoming>
+      <bpmn2:incoming>Flow_12zvhxf</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:startEvent id="StartEvent_1" name="Start">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="deploymentName" label="Deployment Name" type="string" defaultValue="demo" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_00ur3ij</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:userTask id="Activity_1vaczuy" name="Check Deployment">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="deploymentURL" label="Deployment URL" type="string" />
+          <camunda:formField id="deleteDeployment" label="Delete Deployment?" type="boolean" defaultValue="True" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_0coo7st</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_07zhnu6</bpmn2:outgoing>
+      <bpmn2:outgoing>Flow_14b4im0</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="Activity_1xno7a7" name="Get Deployment" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/" + deploymentID</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="deploymentURL">
+              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/" + deploymentID</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1kopve1</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0coo7st</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:serviceTask id="Activity_1kjdks" name="Create Deployment" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">http://localhost:5005/deployments/</camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="Groovy">import groovy.json.JsonBuilder
+println("Start Building Request");
+def programs = [[
+    "quantumCircuit": "OPENQASM 2.0;\ninclude \"qelib1.inc\";\nqreg q[2];\ncreg meas[2];\nh q[0];\ncx q[0],q[1];\nbarrier q[0],q[1];\nmeasure q[0] -&gt; meas[0];\nmeasure q[1] -&gt; meas[1];\n",
+   	"assemblerLanguage": "QASM2",
+   	"pythonFilePath": "ibm_upload_test_data_file.py (Note: this is an experimental feature for IBM_UPLOAD job type)",
+   	"pythonFileMetadata": "ibm_upload_test_data_metadata.json (Note: this is an experimental feature for IBM_UPLOAD job type)"
+]];
+
+def request = [:];
+request.put("programs", programs);
+request.put("name", deploymentName);
+requeststring = new JsonBuilder(request).toPrettyString()
+println(requeststring);
+return requeststring;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="deploymentID">
+              <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");
+resp = new groovy.json.JsonSlurper().parseText(resp)
+print("Final Result is:")
+println(resp)
+return resp.get("id");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:inputOutput />
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_00ur3ij</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1kopve1</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_07zhnu6" sourceRef="Activity_1vaczuy" targetRef="Event_0pxzspo">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${deleteDeployment}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:sequenceFlow id="Flow_00ur3ij" sourceRef="StartEvent_1" targetRef="Activity_1kjdks" />
+    <bpmn2:sequenceFlow id="Flow_0coo7st" sourceRef="Activity_1xno7a7" targetRef="Activity_1vaczuy" />
+    <bpmn2:sequenceFlow id="Flow_1kopve1" sourceRef="Activity_1kjdks" targetRef="Activity_1xno7a7" />
+    <bpmn2:serviceTask id="Activity_1h8sqvx" name="Delete Deployment" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">DELETE</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/" + deploymentID</camunda:script>
+            </camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_14b4im0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1tqmzfq</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_14b4im0" sourceRef="Activity_1vaczuy" targetRef="Activity_1h8sqvx">
+      <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${deleteDeployment}</bpmn2:conditionExpression>
+    </bpmn2:sequenceFlow>
+    <bpmn2:userTask id="Activity_0qft529" name="Check Deployments">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="deploymentURL" label="Deployments URL" type="string" defaultValue="&#34;http://localhost:5005/deployments/&#34;" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_07c4p2d</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_12zvhxf</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="Flow_1tqmzfq" sourceRef="Activity_1h8sqvx" targetRef="Activity_0din5yf" />
+    <bpmn2:sequenceFlow id="Flow_12zvhxf" sourceRef="Activity_0qft529" targetRef="Event_0pxzspo" />
+    <bpmn2:serviceTask id="Activity_0din5yf" name="Get Deployment" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/"</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="deploymentURL">
+              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/"</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1tqmzfq</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_07c4p2d</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_07c4p2d" sourceRef="Activity_0din5yf" targetRef="Activity_0qft529" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UseCase3">
+      <bpmndi:BPMNShape id="BPMNShape_1828l6p" bpmnElement="StartEvent_1">
+        <dc:Bounds x="252" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="258" y="315" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0j42apk" bpmnElement="Activity_1kjdks">
+        <dc:Bounds x="350" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1petv6t" bpmnElement="Activity_1xno7a7">
+        <dc:Bounds x="490" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0c6egva_di" bpmnElement="Activity_1vaczuy">
+        <dc:Bounds x="630" y="250" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0b26lz7" bpmnElement="Activity_1h8sqvx">
+        <dc:Bounds x="790" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0pxzspo_di" bpmnElement="Event_0pxzspo">
+        <dc:Bounds x="1202" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1211" y="315" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0alz0et" bpmnElement="Activity_0qft529">
+        <dc:Bounds x="1030" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_08niafd" bpmnElement="Activity_0din5yf">
+        <dc:Bounds x="910" y="390" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_07zhnu6_di" bpmnElement="Flow_07zhnu6">
+        <di:waypoint x="730" y="290" />
+        <di:waypoint x="1202" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_00ur3ij_di" bpmnElement="Flow_00ur3ij">
+        <di:waypoint x="288" y="290" />
+        <di:waypoint x="350" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0coo7st_di" bpmnElement="Flow_0coo7st">
+        <di:waypoint x="590" y="290" />
+        <di:waypoint x="630" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kopve1_di" bpmnElement="Flow_1kopve1">
+        <di:waypoint x="450" y="290" />
+        <di:waypoint x="490" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_14b4im0_di" bpmnElement="Flow_14b4im0">
+        <di:waypoint x="730" y="290" />
+        <di:waypoint x="760" y="290" />
+        <di:waypoint x="760" y="430" />
+        <di:waypoint x="790" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tqmzfq_di" bpmnElement="Flow_1tqmzfq">
+        <di:waypoint x="890" y="430" />
+        <di:waypoint x="910" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_12zvhxf_di" bpmnElement="Flow_12zvhxf">
+        <di:waypoint x="1130" y="430" />
+        <di:waypoint x="1156" y="430" />
+        <di:waypoint x="1156" y="290" />
+        <di:waypoint x="1202" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07c4p2d_di" bpmnElement="Flow_07c4p2d">
+        <di:waypoint x="1010" y="430" />
+        <di:waypoint x="1030" y="430" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
