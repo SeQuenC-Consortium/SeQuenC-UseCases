@@ -44,7 +44,7 @@ ToDos:
 1. Get all providers
 2. UserTask: Let the user evaluate the results 
 
-### Create and Delete a Deployment (Maxi
+### Create and Delete a Deployment
 1. Create a deployment
 2. Get the deployment details, and get deployment X
 3. UserTask: Evaluate Results of the deployment details
@@ -52,7 +52,7 @@ ToDos:
 5. Get all deployment
 6. UserTask: Evaluate results and check if the deployment X is missing again
 
-### Create, Run and Delete BRAKET Job on AWS (Lukas)
+### Create, Run and Delete BRAKET Job on AWS
 1. Create a job for AWS using Braket
 2. Get the results/details of the job
 3. UserTask: Let the user evaluate the results
@@ -65,13 +65,13 @@ ToDos:
 2. Get the results/details of the job
 3. UserTask: Let the user evaluate the results
 
-### Create QRISP Deployment and run on IBM (Lukas)
+### Create QRISP Deployment and run on IBM
 1. Create a deployment using QRISP
 2. Create a job using the created deployment
 3. Get the results/details of the job
 4. UserTask: Let the user evaluate the results
 
-### Create Deployment with User Inputs and then a Job with UserInputs: (Maxi)
+### Create Deployment with User Inputs and then a Job with UserInputs:
 1. Create a deployment using defined User Inputs
 2. Get the details of the deployment
 3. UserTask: Let the User evaluate the deployment
