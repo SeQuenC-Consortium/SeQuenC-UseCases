@@ -1,33 +1,38 @@
 # SeQuenC-UseCases
 
-THIS IS A WIP VERSION OF THE README
-
-ToDos:
-* Extend Setup with Docker-compose and pictures
-* Extend Running of the Use Cases with Images and examples
 
 ## Setup: 
 
-1. Setup Qunicorn
-2. Setup Camunda
-3. Setup Workflowmodeller
+1. Run qunicorn, camunda and the workflow modeller using the provided docker-compose
+2. The services should now be available under:
+   1. qunicorn: localhost:5005/swagger-ui/
+   2. workflowmodeller: localhost:8080/
+   3. camunda: localhost:8078/camunda/app/
 
 ## Running the Use Cases
 
-1. Have Qunicorn, Camunda and the Workflowmodeller running (possibly using the docker-compose)
-2. Open the Workflowmodeller
-3. Configure the Workflowmodeller, so it uses the correct Camunda Endpoint
+1. Have Qunicorn, Camunda and the Workflowmodeller running (possibly using the docker-compose).
+2. Open the Workflowmodeller.
+3. Configure the Workflowmodeller, so it uses the correct Camunda Endpoint.
 4. Open the Use Case to be executed.
-5. Deploy the Use Case
-6. Open Camunda, navigate to Camunda Tasklist
-   ![UseCase1](./resources/camunda_overview_app.JPG)
-8. Click "Start process" on the top right
-   ![UseCase1](./resources/camunda_task_list_overview.JPG)
+5. Deploy the Use Case.
+6. Open Camunda, navigate to Camunda Tasklist.
+
+   ![CamundaOverview](./resources/camunda_overview_app.JPG)
+8. Click "Start process" on the top right.
+
+   ![TaskListOverview](./resources/camunda_task_list_overview.JPG)
 10. The Deployed Workflow should appear here.
-11. Click on the Workflow and configure the Inputs if necessary
+11. Click on the Workflow and configure the Inputs if necessary.
+
+   ![InitialInput](./resources/initial_input_example.JPG)
 12. Start the process.
-13. UserTasks will appear in the Tasklist
+13. UserTasks will appear in the Tasklist.
+
+   ![UserTaskInList](./resources/user_task_example.JPG)
+14. Click on the UserTask and evaluate it. 
    
+   ![UserTaskDetails](./resources/user_task_detail_example.JPG)
 
 ## Description of the Use Cases
 
@@ -45,13 +50,13 @@ ToDos:
 2. Get the results/details of the job
 3. UserTask: Let the user evaluate the resuls
 
-![UseCase1](./resources/use_case_2_bpmn.JPG)
+![UseCase2](./resources/use_case_2_bpmn.JPG)
 
 ### Get a Provider List
 1. Get all providers
 2. UserTask: Let the user evaluate the results 
 
-![UseCase1](./resources/use_case_3_bpmn.JPG)
+![UseCase3](./resources/use_case_3_bpmn.JPG)
 
 ### Create and Delete a Deployment
 1. Create a deployment
@@ -61,7 +66,7 @@ ToDos:
 5. Get all deployment
 6. UserTask: Evaluate results and check if the deployment X is missing again
 
-![UseCase1](./resources/use_case_4_bpmn.JPG)
+![UseCase4](./resources/use_case_4_bpmn.JPG)
 
 ### Create, Run and Delete BRAKET Job on AWS
 1. Create a job for AWS using Braket
@@ -71,14 +76,14 @@ ToDos:
 5. Get all Jobs
 6. UserTask: Let the user check if the job got deleted and is not in the list anymore
 
-![UseCase1](./resources/use_case_5_bpmn.JPG)
+![UseCase5](./resources/use_case_5_bpmn.JPG)
 
 ### Create, Run BRAKET Deployment on IBM
 1. Create a job for IBM using Braket
 2. Get the results/details of the job
 3. UserTask: Let the user evaluate the results
 
-![UseCase1](./resources/use_case_6_bpmn.JPG)
+![UseCase6](./resources/use_case_6_bpmn.JPG)
 
 ### Create QRISP Deployment and run on IBM
 1. Create a deployment using QRISP
@@ -86,7 +91,7 @@ ToDos:
 3. Get the results/details of the job
 4. UserTask: Let the user evaluate the results
 
-![UseCase1](./resources/use_case_7_bpmn.JPG)
+![UseCase7](./resources/use_case_7_bpmn.JPG)
 
 ### Create Deployment with User Inputs and then a Job with UserInputs:
 1. Create a deployment using defined User Inputs
@@ -96,7 +101,7 @@ ToDos:
 5. Get the results/details of the job
 6. UserTask: Let the user evaluate the results
 
-![UseCase1](./resources/use_case_8_bpmn.JPG)
+![UseCase8](./resources/use_case_8_bpmn.JPG)
 
 ## Naming Scheme for new Use Cases
 

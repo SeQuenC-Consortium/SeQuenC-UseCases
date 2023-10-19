@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
-  <bpmn2:process id="UseCase4" name="UseCase4" isExecutable="true" camunda:versionTag="1.0" camunda:historyTimeToLive="1">
+  <bpmn2:process id="UseCase4" name="UseCase4_DeleteDeployment" isExecutable="true" camunda:versionTag="1.0" camunda:historyTimeToLive="1">
     <bpmn2:endEvent id="Event_0pxzspo" name="End">
       <bpmn2:incoming>Flow_07zhnu6</bpmn2:incoming>
       <bpmn2:incoming>Flow_12zvhxf</bpmn2:incoming>
@@ -160,34 +160,34 @@ return resp.get("id");</camunda:script>
     <bpmn2:sequenceFlow id="Flow_07c4p2d" sourceRef="Activity_0din5yf" targetRef="Activity_0qft529" />
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UseCase3">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UseCase4">
+      <bpmndi:BPMNShape id="Event_0pxzspo_di" bpmnElement="Event_0pxzspo">
+        <dc:Bounds x="1202" y="272" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1211" y="315" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1828l6p" bpmnElement="StartEvent_1">
         <dc:Bounds x="252" y="272" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="258" y="315" width="24" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0j42apk" bpmnElement="Activity_1kjdks">
-        <dc:Bounds x="350" y="250" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0c6egva_di" bpmnElement="Activity_1vaczuy">
+        <dc:Bounds x="630" y="250" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_1petv6t" bpmnElement="Activity_1xno7a7">
         <dc:Bounds x="490" y="250" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0c6egva_di" bpmnElement="Activity_1vaczuy">
-        <dc:Bounds x="630" y="250" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_0j42apk" bpmnElement="Activity_1kjdks">
+        <dc:Bounds x="350" y="250" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0b26lz7" bpmnElement="Activity_1h8sqvx">
         <dc:Bounds x="790" y="390" width="100" height="80" />
         <bpmndi:BPMNLabel />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_0pxzspo_di" bpmnElement="Event_0pxzspo">
-        <dc:Bounds x="1202" y="272" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="1211" y="315" width="19" height="14" />
-        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="BPMNShape_0alz0et" bpmnElement="Activity_0qft529">
         <dc:Bounds x="1030" y="390" width="100" height="80" />
