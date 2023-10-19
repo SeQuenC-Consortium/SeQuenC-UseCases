@@ -19,20 +19,25 @@
 6. Open Camunda, navigate to Camunda Tasklist.
 
    ![CamundaOverview](./resources/camunda_overview_app.JPG)
+   
 8. Click "Start process" on the top right.
 
    ![TaskListOverview](./resources/camunda_task_list_overview.JPG)
+   
 10. The Deployed Workflow should appear here.
 11. Click on the Workflow and configure the Inputs if necessary.
 
    ![InitialInput](./resources/initial_input_example.JPG)
+   
 12. Start the process.
 13. UserTasks will appear in the Tasklist.
 
    ![UserTaskInList](./resources/user_task_example.JPG)
+   
 14. Click on the UserTask and evaluate it. 
    
    ![UserTaskDetails](./resources/user_task_detail_example.JPG)
+   
 
 ## Description of the Use Cases
 
