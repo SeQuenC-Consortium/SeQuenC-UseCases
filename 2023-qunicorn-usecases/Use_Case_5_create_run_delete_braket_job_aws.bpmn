@@ -32,14 +32,12 @@
 println("Start Building Request");
 
 
-def parameters= [0];
 def name = "QunicornTest";
 
 def request = [:];
 request.put("name", "JobName");
 request.put("providerName", "AWS");
 request.put("deviceName", "local_simulator");
-request.put("parameters", parameters);
 request.put("shots", 4000);
 request.put("token", "");
 request.put("type", "RUNNER");

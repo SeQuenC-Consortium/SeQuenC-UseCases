@@ -128,14 +128,12 @@ return resp.get("id");</camunda:script>
 println("Start Building Request");
 
 
-def parameters= [0];
 def name = "QunicornTest";
 
 def request = [:];
 request.put("name", jobName);
 request.put("providerName", providerName);
 request.put("deviceName", deviceName);
-request.put("parameters", parameters);
 request.put("shots", shots as int);
 request.put("token", "");
 request.put("type", type);

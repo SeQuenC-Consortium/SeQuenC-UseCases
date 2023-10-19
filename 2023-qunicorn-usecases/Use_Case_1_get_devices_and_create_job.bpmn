@@ -121,14 +121,12 @@ return "http://localhost:5005/jobs/" + resp.get("id");</camunda:script>
 println("Start Building Request");
 
 
-def parameters= [0];
 def name = "QunicornTest";
 
 def request = [:];
 request.put("name", job_name);
 request.put("providerName", device_provider_name);
 request.put("deviceName", device_name);
-request.put("parameters", parameters);
 request.put("shots", shot_amount);
 request.put("token", "");
 request.put("type", "RUNNER");

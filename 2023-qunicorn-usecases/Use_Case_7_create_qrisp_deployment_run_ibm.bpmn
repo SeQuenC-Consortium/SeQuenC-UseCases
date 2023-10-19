@@ -74,13 +74,10 @@ return resp.get("id");</camunda:script>
               <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
 println("Start Building Request");
 
-def parameters= [0];
-
 def request = [:];
 request.put("name", "UseCaseJobName");
 request.put("providerName", "IBM");
 request.put("deviceName", "aer_simulator");
-request.put("parameters", parameters);
 request.put("shots", 4000);
 request.put("token", "");
 request.put("type", "RUNNER");
