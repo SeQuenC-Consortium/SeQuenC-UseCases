@@ -20,11 +20,14 @@ ToDos:
 4. Open the Use Case to be executed.
 5. Deploy the Use Case
 6. Open Camunda, navigate to Camunda Tasklist
-7. Click "Start process" on the top right
-8. The Deployed Workflow should appear here.
-9. Click on the Workflow and configure the Inputs if necessary
-10. Start the process.
-11. UserTasks will appear in the Tasklist
+   ![UseCase1](./resources/camunda_overview_app.JPG)
+8. Click "Start process" on the top right
+   ![UseCase1](./resources/camunda_task_list_overview.JPG)
+10. The Deployed Workflow should appear here.
+11. Click on the Workflow and configure the Inputs if necessary
+12. Start the process.
+13. UserTasks will appear in the Tasklist
+   
 
 ## Description of the Use Cases
 
@@ -35,14 +38,20 @@ ToDos:
 4. Get the results/details of the job
 5. UserTask: Let the user evaluate the results
 
+![UseCase1](./resources/use_case_1_bpmn.JPG)
+
 ### Rerun Job: (Aer_simulator, QISKIT, IBM)
 1. Rerun a job
 2. Get the results/details of the job
 3. UserTask: Let the user evaluate the resuls
 
+![UseCase1](./resources/use_case_2_bpmn.JPG)
+
 ### Get a Provider List
 1. Get all providers
 2. UserTask: Let the user evaluate the results 
+
+![UseCase1](./resources/use_case_3_bpmn.JPG)
 
 ### Create and Delete a Deployment
 1. Create a deployment
@@ -52,6 +61,8 @@ ToDos:
 5. Get all deployment
 6. UserTask: Evaluate results and check if the deployment X is missing again
 
+![UseCase1](./resources/use_case_4_bpmn.JPG)
+
 ### Create, Run and Delete BRAKET Job on AWS
 1. Create a job for AWS using Braket
 2. Get the results/details of the job
@@ -60,16 +71,22 @@ ToDos:
 5. Get all Jobs
 6. UserTask: Let the user check if the job got deleted and is not in the list anymore
 
+![UseCase1](./resources/use_case_5_bpmn.JPG)
+
 ### Create, Run BRAKET Deployment on IBM
 1. Create a job for IBM using Braket
 2. Get the results/details of the job
 3. UserTask: Let the user evaluate the results
+
+![UseCase1](./resources/use_case_6_bpmn.JPG)
 
 ### Create QRISP Deployment and run on IBM
 1. Create a deployment using QRISP
 2. Create a job using the created deployment
 3. Get the results/details of the job
 4. UserTask: Let the user evaluate the results
+
+![UseCase1](./resources/use_case_7_bpmn.JPG)
 
 ### Create Deployment with User Inputs and then a Job with UserInputs:
 1. Create a deployment using defined User Inputs
@@ -78,6 +95,8 @@ ToDos:
 4. Create a job
 5. Get the results/details of the job
 6. UserTask: Let the user evaluate the results
+
+![UseCase1](./resources/use_case_8_bpmn.JPG)
 
 ## Naming Scheme for new Use Cases
 
