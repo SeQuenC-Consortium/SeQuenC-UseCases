@@ -7,6 +7,7 @@
           <camunda:formField id="programs" label="Quantum Circuit" type="string" defaultValue="Circuit().h(0).cnot(0, 1)" />
           <camunda:formField id="language" label="AssemblerLanguage" type="string" defaultValue="QASM" />
           <camunda:formField id="input_name" label="DeploymentName" type="string" defaultValue="QunicornTestProgram" />
+          <camunda:formField id="qunicornip" label="Qunicorn IP (do not use localhost when running on docker)" type="string" defaultValue="localhost" />
         </camunda:formData>
       </bpmn2:extensionElements>
       <bpmn2:outgoing>Flow_1n1w1w9</bpmn2:outgoing>
@@ -25,7 +26,9 @@
                 <camunda:entry key="Content-Type">application/json</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:5005/deployments/</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/";</camunda:script>
+            </camunda:inputParameter>
             <camunda:inputParameter name="payload">
               <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
 println("Start Building Request");
@@ -69,7 +72,9 @@ return resp.get("id");</camunda:script>
                 <camunda:entry key="Content-Type">application/json</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:5005/jobs/</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/"</camunda:script>
+            </camunda:inputParameter>
             <camunda:inputParameter name="payload">
               <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
 println("Start Building Request");
@@ -121,7 +126,7 @@ return resp.get("id");</camunda:script>
           <camunda:inputOutput>
             <camunda:inputParameter name="url">
               <camunda:script scriptFormat="Groovy">println("Build the IP for get Job")
-return "http://localhost:5005/jobs/" + job_id</camunda:script>
+return "http://" + qunicornip + ":5005/jobs/" + job_id</camunda:script>
             </camunda:inputParameter>
             <camunda:inputParameter name="headers">
               <camunda:map>
@@ -135,7 +140,7 @@ return "http://localhost:5005/jobs/" + job_id</camunda:script>
 resp = new groovy.json.JsonSlurper().parseText(resp)
 print("Final Result is:")
 println(resp)
-return "http://localhost:5005/jobs/"+ resp.get("id");</camunda:script>
+return "http://" + qunicornip + ":5005/jobs/"+ resp.get("id");</camunda:script>
             </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>

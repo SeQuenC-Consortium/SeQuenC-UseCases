@@ -2,7 +2,11 @@
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
   <bpmn2:process id="UseCase6" name="UseCase6_RunBraketOnQiskit" isExecutable="true" camunda:historyTimeToLive="1">
     <bpmn2:startEvent id="StartEvent_1">
-      <bpmn2:extensionElements />
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="qunicornip" label="Qunicorn IP (do not use localhost when running on docker)" type="string" defaultValue="localhost" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
       <bpmn2:outgoing>Flow_1n1w1w9</bpmn2:outgoing>
     </bpmn2:startEvent>
     <bpmn2:endEvent id="Event_0b74xv7">
@@ -20,7 +24,9 @@
                 <camunda:entry key="Content-Type">application/json</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:5005/jobs/</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/";</camunda:script>
+            </camunda:inputParameter>
             <camunda:inputParameter name="payload">
               <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
 println("Start Building Request");
@@ -76,7 +82,7 @@ return resp.get("id");</camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/jobs/" + jobID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/" + jobID;</camunda:script>
             </camunda:inputParameter>
             <camunda:outputParameter name="circuitState">
               <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");

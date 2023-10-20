@@ -9,6 +9,7 @@
       <bpmn2:extensionElements>
         <camunda:formData>
           <camunda:formField id="deploymentName" label="Deployment Name" type="string" defaultValue="demo" />
+          <camunda:formField id="qunicornip" label="Qunicorn IP (do not use localhost when running on docker)" type="string" defaultValue="localhost" />
         </camunda:formData>
       </bpmn2:extensionElements>
       <bpmn2:outgoing>Flow_00ur3ij</bpmn2:outgoing>
@@ -36,10 +37,10 @@
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/" + deploymentID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/" + deploymentID</camunda:script>
             </camunda:inputParameter>
             <camunda:outputParameter name="deploymentURL">
-              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/" + deploymentID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/" + deploymentID</camunda:script>
             </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
@@ -59,7 +60,9 @@
                 <camunda:entry key="Content-Type">application/json</camunda:entry>
               </camunda:map>
             </camunda:inputParameter>
-            <camunda:inputParameter name="url">http://localhost:5005/deployments/</camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/"</camunda:script>
+            </camunda:inputParameter>
             <camunda:inputParameter name="payload">
               <camunda:script scriptFormat="Groovy">import groovy.json.JsonBuilder
 println("Start Building Request");
@@ -110,7 +113,7 @@ return resp.get("id");</camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/" + deploymentID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/" + deploymentID</camunda:script>
             </camunda:inputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
@@ -125,7 +128,7 @@ return resp.get("id");</camunda:script>
     <bpmn2:userTask id="Activity_0qft529" name="Check Deployments">
       <bpmn2:extensionElements>
         <camunda:formData>
-          <camunda:formField id="deploymentURL" label="Deployments URL" type="string" defaultValue="&#34;http://localhost:5005/deployments/&#34;" />
+          <camunda:formField id="deploymentURL" label="Deployments URL" type="string" defaultValue="http://localhost:5005/deployments/" />
         </camunda:formData>
       </bpmn2:extensionElements>
       <bpmn2:incoming>Flow_07c4p2d</bpmn2:incoming>
@@ -145,10 +148,10 @@ return resp.get("id");</camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/"</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/"</camunda:script>
             </camunda:inputParameter>
             <camunda:outputParameter name="deploymentURL">
-              <camunda:script scriptFormat="Groovy">return "http://localhost:5005/deployments/"</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/deployments/"</camunda:script>
             </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
