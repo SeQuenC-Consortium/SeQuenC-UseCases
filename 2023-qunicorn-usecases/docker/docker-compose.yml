@@ -27,6 +27,7 @@ services:
       depends_on:
         - postgres
         - broker
+        - worker
       ports:
         - "5005:5005"
 
