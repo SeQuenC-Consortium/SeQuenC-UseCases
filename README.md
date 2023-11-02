@@ -4,10 +4,15 @@
 ## Setup: 
 
 1. Run qunicorn, camunda and the workflow modeller using the provided docker-compose
+   Note that you might have to set an access token using 
+   ```bash
+   echo PUT_PERSONAL_ACCESS_TOKEN_HERE | docker login ghcr.io -u USERNAME --password-stdin
+   ```
+   first
 2. The services should now be available under:
    1. qunicorn: localhost:5005/swagger-ui/
    2. workflowmodeller: localhost:8080/
-   3. camunda: localhost:8078/camunda/app/
+   3. camunda: localhost:8090/camunda/app/
 
 ## Running the Use Cases
 
@@ -16,7 +21,7 @@
 3. Configure the Workflowmodeller, so it uses the correct Camunda Endpoint.
 4. Open the Use Case to be executed.
 5. Deploy the Use Case.
-6. Open Camunda, navigate to Camunda Tasklist.
+6. Open Camunda, navigate to Camunda Tasklist. (Login using "demo" and "demo")
 
    ![CamundaOverview](./resources/camunda_overview_app.JPG)
    
@@ -25,7 +30,7 @@
    ![TaskListOverview](./resources/camunda_task_list_overview.JPG)
    
 10. The Deployed Workflow should appear here.
-11. Click on the Workflow and configure the Inputs if necessary.
+11. Click on the Workflow and configure the Inputs if necessary. Make sure to change the ip to your local ip if you are running using the docker-compose!
 
    ![InitialInput](./resources/initial_input_example.JPG)
    
