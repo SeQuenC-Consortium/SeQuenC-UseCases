@@ -76,7 +76,7 @@ return resp.get("id");</camunda:script>
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/" + jobID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/" + job_id_new</camunda:script>
             </camunda:inputParameter>
             <camunda:outputParameter name="circuitState">
               <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");
@@ -93,7 +93,7 @@ println(resp)
 return resp.get("results").get(0).get("result_dict").inspect()</camunda:script>
             </camunda:outputParameter>
             <camunda:outputParameter name="jobID">
-              <camunda:script scriptFormat="Groovy">return jobID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return job_id_new</camunda:script>
             </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
@@ -117,7 +117,7 @@ return resp.get("results").get(0).get("result_dict").inspect()</camunda:script>
               <camunda:constraint name="readonly" />
             </camunda:validation>
           </camunda:formField>
-          <camunda:formField id="jobID" label="Job ID" type="string">
+          <camunda:formField id="job_id_new" label="Job ID" type="string">
             <camunda:validation>
               <camunda:constraint name="readonly" />
             </camunda:validation>
