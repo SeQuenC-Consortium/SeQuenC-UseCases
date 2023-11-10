@@ -18,7 +18,7 @@
 
 1. Have Qunicorn, Camunda and the Workflowmodeller running (possibly using the docker-compose).
 2. Open the Workflowmodeller.
-3. Configure the Workflowmodeller, so it uses the correct Camunda Endpoint.
+3. Configure the Workflowmodeller, so it uses the correct Camunda Endpoint. (exchange localhost with your ip)
 4. Open the Use Case to be executed.
 5. Deploy the Use Case.
 6. Open Camunda, navigate to Camunda Tasklist. (Login using "demo" and "demo")
