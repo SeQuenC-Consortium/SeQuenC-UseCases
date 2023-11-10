@@ -1,0 +1,275 @@
+version: '3'
+services:
+
+  # Standard setup based on OpenTosca Docker for the deployment-view plugin demo
+  container:
+    image: opentosca/container:latest
+    ports:
+      - '1337:1337'
+      - '1883:1883' # MQTT
+      - '8081-8087:8081-8087'
+    environment:
+      CONTAINER_HOSTNAME: 129.69.214.201
+      ENGINE_IA_HOSTNAME: engine-ia-jdk8
+      ENGINE_IA_PORT: 8080
+      ENGINE_IA_JAVA17_HOSTNAME: engine-ia-jdk17
+      ENGINE_IA_JAVA17_PORT: 8080
+      ENGINE_PLAN_BPEL_HOSTNAME: engine-plan-bpel
+      ENGINE_PLAN_BPMN_HOSTNAME: engine-plan-bpmn
+      ENGINE_PLAN_BPMN_PORT: 8080
+      CONTAINER_DEPLOYMENT_TESTS: 'false'
+    networks:
+      - qunicorn-tutorial
+  ui:
+    image: opentosca/ui:latest
+    environment:
+     API_ENDPOINT_HOST: 129.69.214.201
+     API_ENDPOINT_PORT: 1337
+     WINERY_HOST: 129.69.214.201
+     WINERY_PORT: 8080
+    ports:
+      - '8088:8080'
+    networks:
+      - qunicorn-tutorial
+  
+  #bowie:
+  #  image: opentosca/bowie:latest
+  #  ports:
+  #    - '4242:80'
+  #  networks:
+  #    - qunicorn-tutorial 
+  
+  engine-plan-bpel:
+    image: opentosca/ode:latest
+    ports:
+      - '9763:9763' # http
+    networks:
+      - qunicorn-tutorial
+  engine-plan-bpmn:
+    image: opentosca/camunda-bpmn:latest
+    ports:
+      - '8092:8080'
+    networks:
+      - qunicorn-tutorial
+  engine-ia-jdk8:
+    image: opentosca/engine-ia:latest-jdk8
+    ports:
+      - '8090:8080'
+    networks:
+      - qunicorn-tutorial
+  engine-ia-jdk17:
+    image: opentosca/engine-ia:latest-jdk17
+    ports:
+      - '8093:8080'
+    networks:
+      - qunicorn-tutorial
+  winery:
+    image: opentosca/winery:latest
+    environment:
+      WINERY_HOSTNAME: 129.69.214.201
+      WORKFLOWMODELER_HOSTNAME: 129.69.214.201
+      TOPOLOGYMODELER_HOSTNAME: 129.69.214.201
+      CONTAINER_HOSTNAME: 129.69.214.201
+      WINERY_REPOSITORY_URL: https://github.com/OpenTOSCA/tosca-definitions-example-applications
+    ports:
+      - '8080:8080'
+    networks:
+      - qunicorn-tutorial
+  dind:
+    image: docker:20.10-dind
+    privileged: true
+    environment:
+      # Disables TLS and starts on port 2375 instead of 2376
+      - DOCKER_TLS_CERTDIR=
+    networks:
+      - qunicorn-tutorial
+    ports: 
+      - '2222:2375'
+      - '9990-9999:9990-9999'
+      - '9990-9999:9990-9999/udp'
+      - '10123:10123'
+  #proxy:
+  #  build: proxy
+  #  cap_add:
+  #    - NET_ADMIN
+  #  ports:
+  #    - '80:80'
+  #  networks:
+  #    - qunicorn-tutorial
+
+  # Camunda on the basis of the view-plugin  
+  camunda-deployment:
+    image: "iaasgeorgdl/camunda-deployment:release.11.23"
+    networks:
+      - qunicorn-tutorial
+    ports:
+      - '8089:8080'
+  
+  # Circuit Generator for visualizing circuits
+  circuit-generator:
+    image: "iaasgeorgdl/circuit-generator:release.11.23"
+    networks:
+      - qunicorn-tutorial
+    ports:
+      - '5073:5073'
+
+  # Workflow-Modeler image is build on the basis of the topology view enhancement
+  workflow-modeler:
+    image: "iaasgeorgdl/workflow-modeler:release.11.23"
+    ports:
+      - 8078:8080
+    networks:
+      - qunicorn-tutorial
+  qunicorn:
+      image: "iaasgeorgdl/qunicorn:release.11.23"
+      networks:
+        - qunicorn-tutorial
+      environment:
+        CONTAINER_MODE: server
+        SERVER_PORT: 5005
+        BROKER_URL: "redis://broker:6379"
+        DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+        JWKS_URL: "http://keycloak:8081/auth/realms/qunicorn/protocol/openid-connect/certs"
+        NUMBA_CACHE_DIR: "/app/cache"
+      depends_on:
+        - postgres
+        - broker
+        - worker
+      ports:
+        - "5005:5005"
+
+
+  worker:
+    image: "iaasgeorgdl/qunicorn:release.11.23"
+    networks:
+      - qunicorn-tutorial
+    environment:
+      CONTAINER_MODE: worker
+      BROKER_URL: "redis://broker:6379"
+      DB_URL: "postgresql://postgres:passwd@postgres/qunicorn"
+      NUMBA_CACHE_DIR: "/app/cache"
+    depends_on:
+      - postgres
+      - broker
+    ports:
+      - "6379"
+
+  # Standard Keycloak container, realm export is the qunicorn realm
+  keycloak:
+    image: jboss/keycloak
+    networks:
+      - qunicorn-tutorial
+    depends_on:
+      - keycloak_postgres
+    ports:
+      - "8091:8080"
+    volumes:
+      - "./resources/keycloak-realm-export.json:/tmp/realm-export.json"
+    environment:
+      DB_VENDOR: postgres
+      KEYCLOAK_USER: kc_user
+      KEYCLOAK_PASSWORD: kc_pass
+      DB_ADDR: keycloak_postgres
+      DB_USER: postgres
+      DB_PASSWORD: passwd
+      KEYCLOAK_IMPORT=/tmp/realm-export.json:
+
+  # Database for the keycloak realms and users
+  keycloak_postgres:
+    image: postgres:15.3
+    networks:
+      - qunicorn-tutorial
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: keycloak
+    volumes:
+      - keycloak_pgdata:/var/lib/postgresql/data \
+
+  # Broker for the Celery (Pilot-Job) setup 
+  broker:
+    image: redis:7.0.12
+    networks:
+      - qunicorn-tutorial
+    ports:
+      - "6379:6379"
+
+  # postgres container for the database for Qunicorn jobs and deployments
+  postgres:
+    image: postgres:15.3
+    networks:
+      - qunicorn-tutorial
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_PASSWORD: passwd
+      POSTGRES_DB: qunicorn
+    volumes:
+      - pgdata:/var/lib/postgresql/data \
+    ports:
+      - "5432:5432"
+
+  # QC-Atlas UI which is based on the enhancement of the execution Service via Qunicorn
+  qc-atlas-ui:
+    image: "iaasgeorgdl/qc-atlas-ui:release.11.23"
+    depends_on:
+      - config-server
+    environment:
+      # because the requests are performed from the browser and not
+      # from the container itself we have to specify localhost here
+      # and **not** the container name
+      QC_ATLAS_HOST_NAME: localhost
+      QC_ATLAS_PORT: 6626
+      PATTERN_ATLAS_HOST_NAME: localhost
+      PATTERN_ATLAS_PORT: 1977
+      PATTERN_ATLAS_UI_HOST_NAME: localhost
+      PATTERN_ATLAS_UI_PORT: 1978
+      NISQ_ANALYZER_HOST_NAME: localhost
+      NISQ_ANALYZER_PORT: 5010
+      QPROV_HOST_NAME: localhost
+      QPROV_PORT: 5020
+      LATEX_RENDERER_HOST_NAME: localhost
+      LATEX_RENDERER_PORT: 5030
+    ports:
+      - '80:80'
+    volumes:
+      - ./config:/opt/init-config.d
+    networks:
+      - qunicorn-tutorial
+
+  # QC-Atlas API    
+  qc-atlas:
+    image: aldekal/qc-atlas:bloqcat
+    environment:
+      POSTGRES_HOSTNAME: db
+      POSTGRES_PORT: 5060
+      POSTGRES_USER: planqk
+      POSTGRES_PASSWORD: planqk
+      POSTGRES_DB: planqk
+    ports:
+      - "6626:6626"
+    networks:
+      - qunicorn-tutorial
+    
+  # Config server für Qc-Atlas  
+  config-server:
+    image: quay.io/coreos/etcd:latest
+    environment:
+      ETCD_NAME: config-node1
+      ETCD_CORS: "*"
+      ETCD_ADVERTISE_CLIENT_URLS: "http://config-server:2379"
+      ETCD_LISTEN_CLIENT_URLS: "http://0.0.0.0:2379"
+      ETCDCTL_API: 3
+    ports:
+      - "2379:2379"
+    networks:
+      - qunicorn-tutorial
+
+  # Unified to the network, also tosca containers
+networks:
+  qunicorn-tutorial:
+    driver: bridge
+
+volumes:
+  pgdata:
+  keycloak_pgdata:
+
