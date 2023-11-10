@@ -25,8 +25,28 @@
               </camunda:map>
             </camunda:inputParameter>
             <camunda:inputParameter name="url">
-              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/rerun/" + jobID</camunda:script>
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/rerun/" + jobID + "/";</camunda:script>
             </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="Groovy">import groovy.json.JsonBuilder
+println("Start Building Request");
+
+def request = [:];
+request.put("token", "");
+requeststring = new JsonBuilder(request).toPrettyString()
+
+println(requeststring);
+return requeststring;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="job_id_new">
+              <camunda:script scriptFormat="Groovy">print("Do we get here Test")
+def resp = connector.getVariable("response");
+println(resp);
+resp = new groovy.json.JsonSlurper().parseText(resp);
+println("The response was:")
+println(resp);
+return resp.get("id");</camunda:script>
+            </camunda:outputParameter>
           </camunda:inputOutput>
           <camunda:connectorId>http-connector</camunda:connectorId>
         </camunda:connector>
