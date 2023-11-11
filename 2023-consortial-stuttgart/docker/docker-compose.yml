@@ -23,9 +23,9 @@ services:
   ui:
     image: opentosca/ui:latest
     environment:
-     API_ENDPOINT_HOST: 129.69.214.201
+     API_ENDPOINT_HOST: ${PUBLIC_HOSTNAME}
      API_ENDPOINT_PORT: 1337
-     WINERY_HOST: 129.69.214.201
+     WINERY_HOST: ${PUBLIC_HOSTNAME}
      WINERY_PORT: 8080
     ports:
       - '8088:8080'
@@ -115,7 +115,7 @@ services:
 
   # Workflow-Modeler image is build on the basis of the topology view enhancement
   workflow-modeler:
-    image: "iaasgeorgdl/workflow-modeler:release.11.23"
+    image: "iaasgeorgdl/workflow-modeler:view-plugin"
     ports:
       - 8078:8080
     networks:
@@ -210,7 +210,7 @@ services:
 
   # QC-Atlas UI which is based on the enhancement of the execution Service via Qunicorn
   qc-atlas-ui:
-    image: "iaasgeorgdl/qc-atlas-ui:release.11.23"
+    image: "iaasgeorgdl/qc-atlas-ui:release"
     depends_on:
       - config-server
     environment:
