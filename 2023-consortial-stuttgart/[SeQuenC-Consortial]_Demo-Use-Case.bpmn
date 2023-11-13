@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
-  <bpmn2:process id="UseCase8" name="UseCase8_DeployRunUserInput" isExecutable="true" camunda:versionTag="1.0" camunda:historyTimeToLive="1">
+  <bpmn2:process id="SeQuenC-Consortial" name="SeQuenC-Consortial-Use-Case" isExecutable="true" camunda:versionTag="1.2" camunda:historyTimeToLive="1">
     <bpmn2:startEvent id="StartEvent_1">
       <bpmn2:extensionElements>
         <camunda:formData>
           <camunda:formField id="quantumCircuit" label="Quantum Circuit" type="string" defaultValue="OPENQASM 2.0;\ninclude \&#34;qelib1.inc\&#34;;\nqreg q[2];\ncreg meas[2];\nh q[0];\ncx q[0],q[1];\nbarrier q[0],q[1];\nmeasure q[0] -&#62; meas[0];\nmeasure q[1] -&#62; meas[1];\n" />
           <camunda:formField id="assemblerLanguage" label="Assembler Language" type="string" defaultValue="QASM2" />
-          <camunda:formField id="pythonFilePath" label="Python File Path" type="string" defaultValue="ibm_upload_test_data_file.py" />
           <camunda:formField id="deploymentName" label="Name" type="string" defaultValue="CustomDeployment" />
-          <camunda:formField id="pythonFileMetadata" label="Python File Metadata" type="string" defaultValue="ibm_upload_test_data_metadata.json" />
           <camunda:formField id="qunicornip" label="Qunicorn IP (do not use localhost when running on docker)" type="string" defaultValue="localhost" />
         </camunda:formData>
       </bpmn2:extensionElements>
@@ -40,8 +38,8 @@ println("Start Building Request");
 def programs = [[
     "quantumCircuit": new StringEscapeUtils().unescapeJavaScript(quantumCircuit),
     "assemblerLanguage": assemblerLanguage,
-    "pythonFilePath": pythonFilePath,
-    "pythonFileMetadata": pythonFileMetadata
+    "pythonFilePath": "",
+    "pythonFileMetadata": ""
 ]];
 def name = deploymentName;
 
@@ -95,7 +93,7 @@ return resp.get("id");</camunda:script>
       <bpmn2:outgoing>Flow_0iojwah</bpmn2:outgoing>
     </bpmn2:serviceTask>
     <bpmn2:sequenceFlow id="Flow_07femho" sourceRef="Activity_08gu4gd" targetRef="Activity_0tnmbeu" />
-    <bpmn2:userTask id="Activity_08gu4gd" name="Show Deployment Results">
+    <bpmn2:userTask id="Activity_08gu4gd" name="Choose Execution Parameters">
       <bpmn2:extensionElements>
         <camunda:inputOutput />
         <camunda:formData>
@@ -104,7 +102,6 @@ return resp.get("id");</camunda:script>
               <camunda:constraint name="readonly" />
             </camunda:validation>
           </camunda:formField>
-          <camunda:formField id="jobName" label="Job Name:" type="string" defaultValue="Custom Job" />
           <camunda:formField id="providerName" label="Provider Name" type="string" defaultValue="IBM" />
           <camunda:formField id="deviceName" label="Device Name" type="string" defaultValue="aer_simulator" />
           <camunda:formField id="shots" label="Shots" type="string" defaultValue="4000" />
@@ -133,10 +130,10 @@ return resp.get("id");</camunda:script>
 println("Start Building Request");
 
 
-def name = "QunicornTest";
+def name = "SeQuenC-Consortial";
 
 def request = [:];
-request.put("name", jobName);
+request.put("name", "SeQuenC-Consortial");
 request.put("providerName", providerName);
 request.put("deviceName", deviceName);
 request.put("shots", shots as int);
@@ -237,7 +234,7 @@ return resp.get("results").get(0).get("result_dict").inspect()</camunda:script>
     <bpmn2:sequenceFlow id="Flow_0xx3npk" sourceRef="Activity_0ob1no3" targetRef="Event_0b74xv7" />
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UseCase8">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="SeQuenC-Consortial">
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="142" y="252" width="36" height="36" />
       </bpmndi:BPMNShape>
