@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
+  <bpmn2:process id="UseCase1_GetDevicesAndCreateJob" name="UseCase1_GetDevicesAndCreateJob" isExecutable="true" camunda:versionTag="0.5" camunda:historyTimeToLive="1">
+    <bpmn2:endEvent id="Event_0b74xv7">
+      <bpmn2:incoming>Flow_0mh5wuy</bpmn2:incoming>
+    </bpmn2:endEvent>
+    <bpmn2:userTask id="Activity_1a5sblu" name="Show Job Results">
+      <bpmn2:extensionElements>
+        <camunda:inputOutput />
+        <camunda:formData>
+          <camunda:formField id="job_result_final" label="Check the Job Results:" type="string">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1s4eiv3</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_0mh5wuy</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:serviceTask id="Activity_1uj1sge" name="Get Job">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">println("Build the IP for get Job")
+return "http://" + qunicornip + ":5005/jobs/" + job_id</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:outputParameter name="job_result_final">
+              <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");
+resp = new groovy.json.JsonSlurper().parseText(resp)
+print("Final Result is:")
+println(resp)
+return "http://localhost:5005/jobs/" + resp.get("id");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1a751gb</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1s4eiv3</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:intermediateCatchEvent id="Event_0grvjc0" name="Wait For Job Completion">
+      <bpmn2:incoming>Flow_02937x0</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1a751gb</bpmn2:outgoing>
+      <bpmn2:timerEventDefinition id="TimerEventDefinition_11n6o66">
+        <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">PT2S</bpmn2:timeDuration>
+      </bpmn2:timerEventDefinition>
+    </bpmn2:intermediateCatchEvent>
+    <bpmn2:serviceTask id="Activity_19lnvs0" name="Get Devices" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">GET</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/devices/"</camunda:script>
+            </camunda:inputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+        <camunda:inputOutput />
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1n1w1w9</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_1kejtan</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:startEvent id="Event_1k99vu7">
+      <bpmn2:extensionElements>
+        <camunda:formData>
+          <camunda:formField id="job_name" label="Name of the Job" type="string" defaultValue="QunicornTestJob" />
+          <camunda:formField id="shot_amount" label="Amount of Shots" type="long" defaultValue="4000" />
+          <camunda:formField id="qunicornip" label="Qunicorn IP (do not use localhost when running on docker)" type="string" defaultValue="localhost" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:outgoing>Flow_1n1w1w9</bpmn2:outgoing>
+    </bpmn2:startEvent>
+    <bpmn2:sequenceFlow id="Flow_0mh5wuy" sourceRef="Activity_1a5sblu" targetRef="Event_0b74xv7" />
+    <bpmn2:sequenceFlow id="Flow_1s4eiv3" sourceRef="Activity_1uj1sge" targetRef="Activity_1a5sblu" />
+    <bpmn2:sequenceFlow id="Flow_1a751gb" sourceRef="Event_0grvjc0" targetRef="Activity_1uj1sge" />
+    <bpmn2:sequenceFlow id="Flow_1kejtan" sourceRef="Activity_19lnvs0" targetRef="Activity_0lakumc" />
+    <bpmn2:sequenceFlow id="Flow_1n1w1w9" sourceRef="Event_1k99vu7" targetRef="Activity_19lnvs0" />
+    <bpmn2:userTask id="Activity_0lakumc" name="Present Devices">
+      <bpmn2:extensionElements>
+        <camunda:inputOutput />
+        <camunda:formData>
+          <camunda:formField id="response_deployment_id" label="Please check the available devices for a device to run on." type="string" defaultValue="http://localhost:5005/devices/">
+            <camunda:validation>
+              <camunda:constraint name="readonly" />
+            </camunda:validation>
+          </camunda:formField>
+          <camunda:formField id="device_provider_name" label="Choose a Provider Name" type="string" defaultValue="IBM" />
+          <camunda:formField id="device_name" label="Choose a Device Name" type="string" defaultValue="aer_simulator" />
+        </camunda:formData>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_1kejtan</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_073c32x</bpmn2:outgoing>
+    </bpmn2:userTask>
+    <bpmn2:sequenceFlow id="Flow_073c32x" sourceRef="Activity_0lakumc" targetRef="Activity_1n9x3em" />
+    <bpmn2:serviceTask id="Activity_1n9x3em" name="Create Job" camunda:exclusive="false">
+      <bpmn2:extensionElements>
+        <camunda:connector>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="method">POST</camunda:inputParameter>
+            <camunda:inputParameter name="headers">
+              <camunda:map>
+                <camunda:entry key="Accept">application/json</camunda:entry>
+                <camunda:entry key="Content-Type">application/json</camunda:entry>
+              </camunda:map>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="url">
+              <camunda:script scriptFormat="Groovy">return "http://" + qunicornip + ":5005/jobs/"</camunda:script>
+            </camunda:inputParameter>
+            <camunda:inputParameter name="payload">
+              <camunda:script scriptFormat="groovy">import groovy.json.JsonBuilder
+println("Start Building Request");
+
+
+def name = "QunicornTest";
+
+def request = [:];
+request.put("name", job_name);
+request.put("providerName", device_provider_name);
+request.put("deviceName", device_name);
+request.put("shots", shot_amount);
+request.put("token", "");
+request.put("type", "RUNNER");
+request.put("deploymentId", 1);
+
+requeststring = new JsonBuilder(request).toPrettyString()
+println(requeststring);
+return requeststring;</camunda:script>
+            </camunda:inputParameter>
+            <camunda:outputParameter name="job_id">
+              <camunda:script scriptFormat="groovy">def resp = connector.getVariable("response");
+resp = new groovy.json.JsonSlurper().parseText(resp)
+println("The response was:")
+println(resp);
+return resp.get("id");</camunda:script>
+            </camunda:outputParameter>
+          </camunda:inputOutput>
+          <camunda:connectorId>http-connector</camunda:connectorId>
+        </camunda:connector>
+      </bpmn2:extensionElements>
+      <bpmn2:incoming>Flow_073c32x</bpmn2:incoming>
+      <bpmn2:outgoing>Flow_02937x0</bpmn2:outgoing>
+    </bpmn2:serviceTask>
+    <bpmn2:sequenceFlow id="Flow_02937x0" sourceRef="Activity_1n9x3em" targetRef="Event_0grvjc0" />
+  </bpmn2:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="UseCase1_GetDevicesAndCreateJob">
+      <bpmndi:BPMNShape id="Event_0b74xv7_di" bpmnElement="Event_0b74xv7">
+        <dc:Bounds x="1612" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1k32jii" bpmnElement="Activity_1a5sblu">
+        <dc:Bounds x="1420" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0x0ydhv" bpmnElement="Activity_1uj1sge">
+        <dc:Bounds x="1260" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19v3u7z_di" bpmnElement="Event_0grvjc0">
+        <dc:Bounds x="1152" y="432" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1139" y="475" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0j42apk" bpmnElement="Activity_19lnvs0">
+        <dc:Bounds x="570" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0f8naes" bpmnElement="Event_1k99vu7">
+        <dc:Bounds x="432" y="432" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_14wdmze" bpmnElement="Activity_0lakumc">
+        <dc:Bounds x="740" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_1e3env1" bpmnElement="Activity_1n9x3em">
+        <dc:Bounds x="960" y="410" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0mh5wuy_di" bpmnElement="Flow_0mh5wuy">
+        <di:waypoint x="1520" y="450" />
+        <di:waypoint x="1612" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1s4eiv3_di" bpmnElement="Flow_1s4eiv3">
+        <di:waypoint x="1360" y="450" />
+        <di:waypoint x="1420" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1a751gb_di" bpmnElement="Flow_1a751gb">
+        <di:waypoint x="1188" y="450" />
+        <di:waypoint x="1260" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1kejtan_di" bpmnElement="Flow_1kejtan">
+        <di:waypoint x="670" y="450" />
+        <di:waypoint x="740" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1n1w1w9_di" bpmnElement="Flow_1n1w1w9">
+        <di:waypoint x="468" y="450" />
+        <di:waypoint x="570" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_073c32x_di" bpmnElement="Flow_073c32x">
+        <di:waypoint x="840" y="450" />
+        <di:waypoint x="960" y="450" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02937x0_di" bpmnElement="Flow_02937x0">
+        <di:waypoint x="1060" y="450" />
+        <di:waypoint x="1152" y="450" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>
