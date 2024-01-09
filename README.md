@@ -1,118 +1,59 @@
-# SeQuenC-UseCases
+# Quantum Workflows, MODULO, and QuantME Use Cases
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-## Setup: 
+This project contains different use cases for the SeQuenC-platform.
+The main purpose is to show how the different components used in the SeQuenC-project interact with the unification-layer.
 
-1. Run qunicorn, camunda and the workflow modeller using the provided docker-compose
-   Note that you might have to set an access token using 
-   ```bash
-   echo PUT_PERSONAL_ACCESS_TOKEN_HERE | docker login ghcr.io -u USERNAME --password-stdin
-   ```
-   first
-2. The services should now be available under:
-   1. qunicorn: localhost:5005/swagger-ui/
-   2. workflowmodeller: localhost:8080/
-   3. camunda: localhost:8090/camunda/app/
+More tools used for the use-cases are the following:
 
-## Running the Use Cases
+- [Quantum Workflow Modeler](https://github.com/SeQuenC-Consortium/workflow-modeler): A graphical BPMN modeler.
+- [Camunda BPMN Engine](https://camunda.com/products/camunda-platform/bpmn-engine/): A state-of-the-art BPMN workflow engine used to execute quantum workflows.
 
-1. Have Qunicorn, Camunda and the Workflowmodeller running (possibly using the docker-compose).
-2. Open the Workflowmodeller.
-3. Configure the Workflowmodeller, so it uses the correct Camunda Endpoint. (exchange localhost with your ip)
-4. Open the Use Case to be executed.
-5. Deploy the Use Case.
-6. Open Camunda, navigate to Camunda Tasklist. (Login using "demo" and "demo")
+### Example 2023
 
-   ![CamundaOverview](./resources/camunda_overview_app.JPG)
-   
-8. Click "Start process" on the top right.
+### Qunicorn 2023 - Use-cases
 
-   ![TaskListOverview](./resources/camunda_task_list_overview.JPG)
-   
-10. The Deployed Workflow should appear here.
-11. Click on the Workflow and configure the Inputs if necessary. Make sure to change the ip to your local ip if you are running using the docker-compose!
+### Consortial 2023 - Stuttgart
 
-   ![InitialInput](./resources/initial_input_example.JPG)
-   
-12. Start the process.
-13. UserTasks will appear in the Tasklist.
+### Workshop 2023 - Berlin
 
-   ![UserTaskInList](./resources/user_task_example.JPG)
-   
-14. Click on the UserTask and evaluate it. 
-   
-   ![UserTaskDetails](./resources/user_task_detail_example.JPG)
-   
+## Learn More
 
-## Description of the Use Cases
+- Georg, Daniel; Barzen, Johanna; Beisel, Martin; Leymann, Frank; Obst, Julian; Vietz, Daniel; Weder, Benjamin; Yussupov, Vladimir: [**Execution Patterns for Quantum Applications**](https://www.iaas.uni-stuttgart.de/publications/Georg2023_PatternsQuantumExecution.pdf). In: Proceedings of the 18th International Conference on Software Technologies - ICSOFT, SciTePress, 2023.
 
-### Get Devices and Create Job:
-1. Get all devices
-2. UserTask: Let the user evaluate the results, the user can now select a device
-3. Create a job with the choosen device, and other user inputs
-4. Get the results/details of the job
-5. UserTask: Let the user evaluate the results
+- Bühler, Fabian; Barzen, Johanna; Beisel, Martin; Georg, Daniel; Leymann, Frank; Wild, Karoline: [**Patterns for Quantum Software Development**](https://www.iaas.uni-stuttgart.de/publications/Buehler2023_PatternsQuantumSE.pdf). In: Proceedings of the 15th International Conference on Pervasive Patterns and Applications (PATTERNS 2023), Xpert Publishing Services (XPS), 2023.
 
-![UseCase1](./resources/use_case_1_bpmn.JPG)
+### Repository structure
 
-### Rerun Job: (Aer_simulator, QISKIT, IBM)
-1. Rerun a job
-2. Get the results/details of the job
-3. UserTask: Let the user evaluate the resuls
+```
+SEQUENC-USECASES
+│   README.md
+│
+└───USE-CASE
+│   │   README.md
+│   │
+│   └───docker
+│   |   │   dockerfile
+│   |   |   docker-compose
+|   |
+│   └───resources
+│   |   │   example.jpg
+|   |
+│   └───workflows
+│       │   workflow.bpmn
+│       │
+```
 
-![UseCase2](./resources/use_case_2_bpmn.JPG)
+This structure is the base structure for use-cases.
+Important files are the README explaining the use-case in more detail. The docker files used to execute. In the resources folder screenshots, videos or other material can be placed. Another folder, in most examples workflows are in the rspective folder.
 
-### Get a Provider List
-1. Get all providers
-2. UserTask: Let the user evaluate the results 
+## Disclaimer of Warranty
 
-![UseCase3](./resources/use_case_3_bpmn.JPG)
+Unless required by applicable law or agreed to in writing, Licensor provides the Work (and each Contributor provides its Contributions) on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied, including, without limitation, any warranties or conditions of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A PARTICULAR PURPOSE.
+You are solely responsible for determining the appropriateness of using or redistributing the Work and assume any risks associated with Your exercise of permissions under this License.
 
-### Create and Delete a Deployment
-1. Create a deployment
-2. Get the deployment details, and get deployment X
-3. UserTask: Evaluate Results of the deployment details
-4. Delete the deployment
-5. Get all deployment
-6. UserTask: Evaluate results and check if the deployment X is missing again
+## Haftungsausschluss
 
-![UseCase4](./resources/use_case_4_bpmn.JPG)
-
-### Create, Run and Delete BRAKET Job on AWS
-1. Create a job for AWS using Braket
-2. Get the results/details of the job
-3. UserTask: Let the user evaluate the results
-4. Delete the job
-5. Get all Jobs
-6. UserTask: Let the user check if the job got deleted and is not in the list anymore
-
-![UseCase5](./resources/use_case_5_bpmn.JPG)
-
-### Create, Run BRAKET Deployment on IBM
-1. Create a job for IBM using Braket
-2. Get the results/details of the job
-3. UserTask: Let the user evaluate the results
-
-![UseCase6](./resources/use_case_6_bpmn.JPG)
-
-### Create QRISP Deployment and run on IBM
-1. Create a deployment using QRISP
-2. Create a job using the created deployment
-3. Get the results/details of the job
-4. UserTask: Let the user evaluate the results
-
-![UseCase7](./resources/use_case_7_bpmn.JPG)
-
-### Create Deployment with User Inputs and then a Job with UserInputs:
-1. Create a deployment using defined User Inputs
-2. Get the details of the deployment
-3. UserTask: Let the User evaluate the deployment
-4. Create a job
-5. Get the results/details of the job
-6. UserTask: Let the user evaluate the results
-
-![UseCase8](./resources/use_case_8_bpmn.JPG)
-
-## Naming Scheme for new Use Cases
-
-Use_Case_#NR_Description
+Dies ist ein Forschungsprototyp.
+Die Haftung für entgangenen Gewinn, Produktionsausfall, Betriebsunterbrechung, entgangene Nutzungen, Verlust von Daten und Informationen, Finanzierungsaufwendungen sowie sonstige Vermögens- und Folgeschäden ist, außer in Fällen von grober Fahrlässigkeit, Vorsatz und Personenschäden, ausgeschlossen.
