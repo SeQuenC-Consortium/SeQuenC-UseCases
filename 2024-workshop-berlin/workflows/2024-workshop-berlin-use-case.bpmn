@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="sample-diagram" targetNamespace="http://bpmn.io/schema/bpmn" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd">
-  <bpmn2:process id="Process_1" isExecutable="true">
-    <bpmn2:sequenceFlow id="Flow_1m6lop6" sourceRef="Activity_1mr3iz2" targetRef="Activity_0nhrtqc" />
-    <bpmn2:sequenceFlow id="Flow_0kctuf9" sourceRef="Activity_0nhrtqc" targetRef="Activity_03f6od3" />
-    <bpmn2:sequenceFlow id="Flow_1m5mc3w" sourceRef="Activity_03f6od3" targetRef="Activity_0liqgoj" />
-    <bpmn2:userTask id="Activity_0liqgoj">
+  <bpmn2:process id="FOKUS-UseCase" name="FOKUS-Meeting" isExecutable="true" camunda:versionTag="1.0">
+    <bpmn2:sequenceFlow id="Flow_1m6lop6" sourceRef="Activity_WS" targetRef="Activity_Generate" />
+    <bpmn2:sequenceFlow id="Flow_0kctuf9" sourceRef="Activity_Generate" targetRef="Activity_03f6od3" />
+    <bpmn2:sequenceFlow id="Flow_1m5mc3w" sourceRef="Activity_03f6od3" targetRef="Activity_human" />
+    <bpmn2:userTask id="Activity_human" name="Examine Result Details">
       <bpmn2:extensionElements>
         <camunda:formData>
           <camunda:formField id="plotUrl" label="Result Image URL" type="string">
@@ -18,7 +18,7 @@
     <bpmn2:endEvent id="Event_12d83t8">
       <bpmn2:incoming>Flow_1az7xab</bpmn2:incoming>
     </bpmn2:endEvent>
-    <bpmn2:sequenceFlow id="Flow_1az7xab" sourceRef="Activity_0liqgoj" targetRef="Event_12d83t8" />
+    <bpmn2:sequenceFlow id="Flow_1az7xab" sourceRef="Activity_human" targetRef="Event_12d83t8" />
     <bpmn2:subProcess id="Activity_03f6od3">
       <bpmn2:incoming>Flow_0kctuf9</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1m5mc3w</bpmn2:outgoing>
@@ -39,8 +39,8 @@
         <bpmn2:incoming>Flow_0hfu1ms</bpmn2:incoming>
       </bpmn2:endEvent>
       <bpmn2:sequenceFlow id="Flow_0lk6f27" sourceRef="Activity_054v3u5" targetRef="Gateway_1he4u1l" />
-      <bpmn2:sequenceFlow id="Flow_0s0dowc" sourceRef="Gateway_1he4u1l" targetRef="Activity_19lnvs0" />
-      <bpmn2:sequenceFlow id="Flow_1aw5wvc" sourceRef="Activity_16z2x7p" targetRef="Gateway_19sszt6" />
+      <bpmn2:sequenceFlow id="Flow_0s0dowc" sourceRef="Gateway_1he4u1l" targetRef="Activity_Deployment" />
+      <bpmn2:sequenceFlow id="Flow_1aw5wvc" sourceRef="Activity_Eval" targetRef="Gateway_19sszt6" />
       <bpmn2:sequenceFlow id="Flow_0hfu1ms" sourceRef="Gateway_19sszt6" targetRef="Event_1hzqhce">
         <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${ execution.getVariable('converged')!= null &amp;&amp; execution.getVariable('converged') == 'true'}</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
@@ -48,7 +48,7 @@
         <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${ execution.getVariable('converged')== null || execution.getVariable('converged') == 'false'}</bpmn2:conditionExpression>
       </bpmn2:sequenceFlow>
       <bpmn2:sequenceFlow id="Flow_0uthl14" sourceRef="Event_1wamr3y" targetRef="Gateway_1he4u1l" />
-      <bpmn2:serviceTask id="Activity_16z2x7p" name="Evaluate Results" camunda:asyncAfter="true" camunda:exclusive="false">
+      <bpmn2:serviceTask id="Activity_Eval" name="Evaluate Results" camunda:asyncAfter="true" camunda:exclusive="false">
         <bpmn2:extensionElements>
           <camunda:connector>
             <camunda:inputOutput>
@@ -63,20 +63,21 @@
               <camunda:inputParameter name="payload">
                 <camunda:script scriptFormat="groovy">  import groovy.json.JsonBuilder
   def adjMatrix = execution.getVariable("adjMatrix");
-  def mitigatedCounts = execution.getVariable("mitigatedCounts");
-  def counts = execution.getVariable("counts")[0];
+println(adjMatrix);
+  def counts = execution.getVariable("counts");
+println(counts);
   def objFun = execution.getVariable("objectiveFunction");
+println("ObjectiveFunction");
+println(objFun);
 
-  if (mitigatedCounts != null) {
-    counts = mitigatedCounts
-  }
 
   def request = [:];
   request.put("visualization", "True"  )
   request.put("adj_matrix", adjMatrix);
   request.put("counts", counts);
   request.put("objFun", objFun);
-
+println("Evaluate Results Connector Inputs: request");
+println(request);
   def objFun_hyperparameters = [:]
   if (execution.getVariable("alpha") != null){
     objFun_hyperparameters.put("alpha", execution.getVariable("alpha"));
@@ -114,6 +115,9 @@ return costs;</camunda:script>
 								FileValue typedFileValue = Variables.fileValue(filename).file(slurper.visualization.decodeBase64()).mimeType("application/png").create()
 typedFileValue</camunda:script>
               </camunda:outputParameter>
+              <camunda:outputParameter name="converged">
+                <camunda:script scriptFormat="groovy">return "true";</camunda:script>
+              </camunda:outputParameter>
             </camunda:inputOutput>
             <camunda:connectorId>http-connector</camunda:connectorId>
           </camunda:connector>
@@ -149,7 +153,7 @@ typedFileValue</camunda:script>
         <bpmn2:endEvent id="Event_1hw4q96">
           <bpmn2:incoming>Flow_1misw4o</bpmn2:incoming>
         </bpmn2:endEvent>
-        <bpmn2:serviceTask id="Activity_1qemn6r" name="Initialize Optimizer" camunda:asyncAfter="true" camunda:exclusive="false">
+        <bpmn2:serviceTask id="Activity_initopt" name="Initialize Optimizer" camunda:asyncAfter="true" camunda:exclusive="false">
           <bpmn2:extensionElements>
             <camunda:connector>
               <camunda:inputOutput>
@@ -186,7 +190,7 @@ typedFileValue</camunda:script>
                 </camunda:script>
                 </camunda:outputParameter>
                 <camunda:outputParameter name="converged">
-                  <camunda:script scriptFormat="groovy">return "false";</camunda:script>
+                  <camunda:script scriptFormat="groovy">return "true";</camunda:script>
                 </camunda:outputParameter>
               </camunda:inputOutput>
               <camunda:connectorId>http-connector</camunda:connectorId>
@@ -195,7 +199,7 @@ typedFileValue</camunda:script>
           <bpmn2:incoming>Flow_11lcfhp</bpmn2:incoming>
           <bpmn2:outgoing>Flow_008e0a2</bpmn2:outgoing>
         </bpmn2:serviceTask>
-        <bpmn2:serviceTask id="Activity_0kw15o8" name="Optimizer Parameters" camunda:asyncAfter="true" camunda:exclusive="false" camunda:type="external" camunda:topic="12345">
+        <bpmn2:serviceTask id="Activity_optparam" name="Optimizer Parameters" camunda:asyncAfter="true" camunda:exclusive="false" camunda:type="external" camunda:topic="12345">
           <bpmn2:extensionElements>
             <camunda:inputOutput>
               <camunda:outputParameter name="iterations">
@@ -213,14 +217,14 @@ typedFileValue</camunda:script>
         <bpmn2:sequenceFlow id="Flow_1p662sd" name="No" sourceRef="Gateway_0pp300t" targetRef="Gateway_0d0xg4q">
           <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${ execution.getVariable('iterations')!= null &amp;&amp; execution.getVariable('iterations') &gt;= 1}</bpmn2:conditionExpression>
         </bpmn2:sequenceFlow>
-        <bpmn2:sequenceFlow id="Flow_11lcfhp" name="Yes" sourceRef="Gateway_0pp300t" targetRef="Activity_1qemn6r">
+        <bpmn2:sequenceFlow id="Flow_11lcfhp" name="Yes" sourceRef="Gateway_0pp300t" targetRef="Activity_initopt">
           <bpmn2:conditionExpression xsi:type="bpmn2:tFormalExpression">${ execution.getVariable('iterations')== null || execution.getVariable('iterations') &lt; 1}</bpmn2:conditionExpression>
         </bpmn2:sequenceFlow>
-        <bpmn2:sequenceFlow id="Flow_008e0a2" sourceRef="Activity_1qemn6r" targetRef="Gateway_0d0xg4q" />
-        <bpmn2:sequenceFlow id="Flow_1svdrnh" sourceRef="Gateway_0d0xg4q" targetRef="Activity_0kw15o8" />
-        <bpmn2:sequenceFlow id="Flow_1misw4o" sourceRef="Activity_0kw15o8" targetRef="Event_1hw4q96" />
+        <bpmn2:sequenceFlow id="Flow_008e0a2" sourceRef="Activity_initopt" targetRef="Gateway_0d0xg4q" />
+        <bpmn2:sequenceFlow id="Flow_1svdrnh" sourceRef="Gateway_0d0xg4q" targetRef="Activity_optparam" />
+        <bpmn2:sequenceFlow id="Flow_1misw4o" sourceRef="Activity_optparam" targetRef="Event_1hw4q96" />
       </bpmn2:subProcess>
-      <bpmn2:serviceTask id="Activity_19lnvs0" name="Create Deployment" camunda:exclusive="false">
+      <bpmn2:serviceTask id="Activity_Deployment" name="Create Deployment" camunda:exclusive="false">
         <bpmn2:extensionElements>
           <camunda:connector>
             <camunda:inputOutput>
@@ -239,7 +243,12 @@ typedFileValue</camunda:script>
 
 import groovy.json.StringEscapeUtils 
 println("Start Building Request");
+
 def circuit = execution.getVariable('circuit')[0]
+if (assemblerLanguage == 'QISKIT'){
+   circuit = 'circuit=' + circuit;
+}
+println("QC-STRING:" + circuit);
 def programs = [[
     "quantumCircuit": new StringEscapeUtils().unescapeJavaScript(circuit),
     "assemblerLanguage": assemblerLanguage,
@@ -256,7 +265,7 @@ println("CREATEDEPLOYMENTTASK")
 println(requeststring);
 return requeststring;</camunda:script>
               </camunda:inputParameter>
-              <camunda:outputParameter name="deployment_id">
+              <camunda:outputParameter name="deploymentID">
                 <camunda:script scriptFormat="groovy">def resp = connector.getVariable("response");
 resp = new groovy.json.JsonSlurper().parseText(resp)
 println("The response was:")
@@ -270,8 +279,8 @@ return resp.get("id");</camunda:script>
         <bpmn2:incoming>Flow_0s0dowc</bpmn2:incoming>
         <bpmn2:outgoing>Flow_0feq272</bpmn2:outgoing>
       </bpmn2:serviceTask>
-      <bpmn2:sequenceFlow id="Flow_0feq272" sourceRef="Activity_19lnvs0" targetRef="Activity_0tnmbeu" />
-      <bpmn2:serviceTask id="Activity_0tnmbeu" name="Create Job" camunda:exclusive="false">
+      <bpmn2:sequenceFlow id="Flow_0feq272" sourceRef="Activity_Deployment" targetRef="Activity_Job" />
+      <bpmn2:serviceTask id="Activity_Job" name="Create Job" camunda:exclusive="false">
         <bpmn2:extensionElements>
           <camunda:connector>
             <camunda:inputOutput>
@@ -291,6 +300,11 @@ println("Start Building Request");
 
 
 def name = "QunicornTest";
+def jobName = "Fokus-Job";
+def shots = 4000;
+def deviceName = "aer_simulator";
+def type = "RUNNER";
+def providerName = "IBM";
 
 def request = [:];
 request.put("name", jobName);
@@ -309,8 +323,7 @@ return requeststring;</camunda:script>
               <camunda:outputParameter name="jobID">
                 <camunda:script scriptFormat="groovy">def resp = connector.getVariable("response");
 resp = new groovy.json.JsonSlurper().parseText(resp)
-println("The response was:")
-println(resp);
+println("Connector Output: jobID")
 return resp.get("id");</camunda:script>
               </camunda:outputParameter>
             </camunda:inputOutput>
@@ -320,8 +333,8 @@ return resp.get("id");</camunda:script>
         <bpmn2:incoming>Flow_0feq272</bpmn2:incoming>
         <bpmn2:outgoing>Flow_108b5gn</bpmn2:outgoing>
       </bpmn2:serviceTask>
-      <bpmn2:sequenceFlow id="Flow_108b5gn" sourceRef="Activity_0tnmbeu" targetRef="Activity_0auhdvp" />
-      <bpmn2:serviceTask id="Activity_0auhdvp" name="Get Results" camunda:exclusive="false">
+      <bpmn2:sequenceFlow id="Flow_108b5gn" sourceRef="Activity_Job" targetRef="Event_0grvjc0" />
+      <bpmn2:serviceTask id="Activity_GETQunicorn" name="Get Results" camunda:exclusive="false">
         <bpmn2:extensionElements>
           <camunda:connector>
             <camunda:inputOutput>
@@ -338,15 +351,15 @@ return resp.get("id");</camunda:script>
               <camunda:outputParameter name="circuitState">
                 <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");
 resp = new groovy.json.JsonSlurper().parseText(resp)
-print("Final Result is:")
-println(resp)
 return resp.get("state");</camunda:script>
               </camunda:outputParameter>
               <camunda:outputParameter name="circuitResult">
                 <camunda:script scriptFormat="Groovy">def resp = connector.getVariable("response");
 resp = new groovy.json.JsonSlurper().parseText(resp)
 print("Final Result is:")
-println(resp)
+println(resp);
+println("Connector output: circuitResult:");
+println(resp.get("results").get(0).get("result_dict").get("counts"));
 return resp.get("results").get(0).get("result_dict").inspect()</camunda:script>
               </camunda:outputParameter>
               <camunda:outputParameter name="jobID">
@@ -354,27 +367,42 @@ return resp.get("results").get(0).get("result_dict").inspect()</camunda:script>
               </camunda:outputParameter>
               <camunda:outputParameter name="counts">
                 <camunda:script scriptFormat="groovy">def resp = connector.getVariable("response");
-resp = new groovy.json.JsonSlurperClassic().parseText(resp);
-println("PRINTRESULTSTASK")
-println(resp);
-counts_array= [];
-for (el in resp){
-println(el);
-   counts_array.push(el.get('counts'));
-}
-println(counts_array);
-counts_array;</camunda:script>
+resp = new groovy.json.JsonSlurper().parseText(resp);
+println("Connector output: counts:");
+println(resp.get("results").get(0).get("result_dict").get("counts"));
+
+def inputMap = resp.get("results").get(0).get("result_dict").get("counts");
+
+def hexString = "0x7F"
+def binaryString = new BigInteger(hexString.substring(2), 16).toString(2)
+
+def outputMap = inputMap.collectEntries { key, value -&gt;
+    def binaryKey = new BigInteger(key.substring(2), 16).toString(2).padLeft(3, '0')
+    ["$binaryKey": value]
+};
+
+println (outputMap);
+
+return outputMap;</camunda:script>
               </camunda:outputParameter>
             </camunda:inputOutput>
             <camunda:connectorId>http-connector</camunda:connectorId>
           </camunda:connector>
         </bpmn2:extensionElements>
-        <bpmn2:incoming>Flow_108b5gn</bpmn2:incoming>
+        <bpmn2:incoming>Flow_1j2knps</bpmn2:incoming>
         <bpmn2:outgoing>Flow_0e866cm</bpmn2:outgoing>
       </bpmn2:serviceTask>
-      <bpmn2:sequenceFlow id="Flow_0e866cm" sourceRef="Activity_0auhdvp" targetRef="Activity_16z2x7p" />
+      <bpmn2:sequenceFlow id="Flow_0e866cm" sourceRef="Activity_GETQunicorn" targetRef="Activity_Eval" />
+      <bpmn2:intermediateCatchEvent id="Event_0grvjc0" name="Wait For Job Completion">
+        <bpmn2:incoming>Flow_108b5gn</bpmn2:incoming>
+        <bpmn2:outgoing>Flow_1j2knps</bpmn2:outgoing>
+        <bpmn2:timerEventDefinition id="TimerEventDefinition_11n6o66">
+          <bpmn2:timeDuration xsi:type="bpmn2:tFormalExpression">PT2S</bpmn2:timeDuration>
+        </bpmn2:timerEventDefinition>
+      </bpmn2:intermediateCatchEvent>
+      <bpmn2:sequenceFlow id="Flow_1j2knps" sourceRef="Event_0grvjc0" targetRef="Activity_GETQunicorn" />
     </bpmn2:subProcess>
-    <bpmn2:serviceTask id="Activity_1mr3iz2" name="Warm-Start Quantum Algorithm" camunda:asyncAfter="true" camunda:exclusive="false">
+    <bpmn2:serviceTask id="Activity_WS" name="Warm-Start Quantum Algorithm" camunda:asyncAfter="true" camunda:exclusive="false">
       <bpmn2:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
@@ -460,7 +488,7 @@ return wsValue;</camunda:script>
       <bpmn2:incoming>Flow_0ozjotm</bpmn2:incoming>
       <bpmn2:outgoing>Flow_1m6lop6</bpmn2:outgoing>
     </bpmn2:serviceTask>
-    <bpmn2:serviceTask id="Activity_0nhrtqc" name="Generate Circuits" camunda:asyncAfter="true" camunda:exclusive="false">
+    <bpmn2:serviceTask id="Activity_Generate" name="Generate Circuits" camunda:asyncAfter="true" camunda:exclusive="false">
       <bpmn2:extensionElements>
         <camunda:connector>
           <camunda:inputOutput>
@@ -479,7 +507,7 @@ return wsValue;</camunda:script>
 
   def request = [:];
   request.put("adj_matrix", adjMatrix);
-  request.put("parameterized", "true");
+  request.put("parameterized", "false");
   request.put("p", 1);
   if (execution.getVariable("wsBitstring") != null) {
     request.put("initial_state", execution.getVariable("wsBitstring"));
@@ -522,7 +550,7 @@ return n_qubits;</camunda:script>
       <bpmn2:incoming>Flow_1m6lop6</bpmn2:incoming>
       <bpmn2:outgoing>Flow_0kctuf9</bpmn2:outgoing>
     </bpmn2:serviceTask>
-    <bpmn2:startEvent id="Event_1qstvak">
+    <bpmn2:startEvent id="Event_Start">
       <bpmn2:extensionElements>
         <camunda:formData>
           <camunda:formField id="quantumCircuit" label="Quantum Circuit" type="string" defaultValue="OPENQASM 2.0;\ninclude \&#34;qelib1.inc\&#34;;\nqreg q[2];\ncreg meas[2];\nh q[0];\ncx q[0],q[1];\nbarrier q[0],q[1];\nmeasure q[0] -&#62; meas[0];\nmeasure q[1] -&#62; meas[1];\n" />
@@ -539,18 +567,16 @@ return n_qubits;</camunda:script>
       </bpmn2:extensionElements>
       <bpmn2:outgoing>Flow_0ozjotm</bpmn2:outgoing>
     </bpmn2:startEvent>
-    <bpmn2:sequenceFlow id="Flow_0ozjotm" sourceRef="Event_1qstvak" targetRef="Activity_1mr3iz2" />
+    <bpmn2:sequenceFlow id="Flow_0ozjotm" sourceRef="Event_Start" targetRef="Activity_WS" />
   </bpmn2:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
-      <bpmndi:BPMNShape id="Activity_05cfk3r_di" bpmnElement="Activity_0liqgoj">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FOKUS-UseCase">
+      <bpmndi:BPMNShape id="Activity_05cfk3r_di" bpmnElement="Activity_human">
         <dc:Bounds x="1370" y="200" width="100" height="80" />
+        <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_12d83t8_di" bpmnElement="Event_12d83t8">
         <dc:Bounds x="1502" y="222" width="36" height="36" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_13wjajq" bpmnElement="Event_1qstvak">
-        <dc:Bounds x="2" y="222" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_1o8lxqg_di" bpmnElement="Activity_03f6od3" isExpanded="true">
         <dc:Bounds x="380" y="40" width="960" height="370" />
@@ -558,29 +584,35 @@ return n_qubits;</camunda:script>
       <bpmndi:BPMNShape id="Event_1wamr3y_di" bpmnElement="Event_1wamr3y">
         <dc:Bounds x="400" y="329" width="36" height="36" />
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1he4u1l_di" bpmnElement="Gateway_1he4u1l" isMarkerVisible="true">
+        <dc:Bounds x="525" y="322" width="50" height="50" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Gateway_19sszt6_di" bpmnElement="Gateway_19sszt6" isMarkerVisible="true">
         <dc:Bounds x="1186" y="322" width="50" height="50" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_1hzqhce_di" bpmnElement="Event_1hzqhce">
         <dc:Bounds x="1282" y="329" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0xbwtom_di" bpmnElement="Activity_16z2x7p">
-        <dc:Bounds x="1036" y="307" width="100" height="80" />
+      <bpmndi:BPMNShape id="Activity_0xbwtom_di" bpmnElement="Activity_Eval">
+        <dc:Bounds x="1060" y="307" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Gateway_1he4u1l_di" bpmnElement="Gateway_1he4u1l" isMarkerVisible="true">
-        <dc:Bounds x="525" y="322" width="50" height="50" />
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0j42apk" bpmnElement="Activity_19lnvs0">
-        <dc:Bounds x="650" y="307" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_0j42apk" bpmnElement="Activity_Deployment">
+        <dc:Bounds x="620" y="307" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0dhos0i" bpmnElement="Activity_0tnmbeu">
-        <dc:Bounds x="780" y="307" width="100" height="80" />
+      <bpmndi:BPMNShape id="BPMNShape_0dhos0i" bpmnElement="Activity_Job">
+        <dc:Bounds x="750" y="307" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="BPMNShape_0w60ih9" bpmnElement="Activity_0auhdvp">
-        <dc:Bounds x="910" y="307" width="100" height="80" />
+      <bpmndi:BPMNShape id="Event_19v3u7z_di" bpmnElement="Event_0grvjc0">
+        <dc:Bounds x="872" y="329" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="859" y="372" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0w60ih9" bpmnElement="Activity_GETQunicorn">
+        <dc:Bounds x="940" y="307" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Activity_0dut6hi_di" bpmnElement="Activity_054v3u5" isExpanded="true">
@@ -601,11 +633,11 @@ return n_qubits;</camunda:script>
       <bpmndi:BPMNShape id="Event_1hw4q96_di" bpmnElement="Event_1hw4q96">
         <dc:Bounds x="1199" y="104" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1qemn6r_di" bpmnElement="Activity_1qemn6r">
+      <bpmndi:BPMNShape id="Activity_1qemn6r_di" bpmnElement="Activity_initopt">
         <dc:Bounds x="799" y="157" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0kw15o8_di" bpmnElement="Activity_0kw15o8">
+      <bpmndi:BPMNShape id="Activity_0kw15o8_di" bpmnElement="Activity_optparam">
         <dc:Bounds x="1049" y="82" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
@@ -652,10 +684,10 @@ return n_qubits;</camunda:script>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0s0dowc_di" bpmnElement="Flow_0s0dowc">
         <di:waypoint x="575" y="347" />
-        <di:waypoint x="650" y="347" />
+        <di:waypoint x="620" y="347" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1aw5wvc_di" bpmnElement="Flow_1aw5wvc">
-        <di:waypoint x="1136" y="347" />
+        <di:waypoint x="1160" y="347" />
         <di:waypoint x="1186" y="347" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0hfu1ms_di" bpmnElement="Flow_0hfu1ms">
@@ -671,24 +703,31 @@ return n_qubits;</camunda:script>
         <di:waypoint x="525" y="347" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0feq272_di" bpmnElement="Flow_0feq272">
+        <di:waypoint x="720" y="347" />
         <di:waypoint x="750" y="347" />
-        <di:waypoint x="780" y="347" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_108b5gn_di" bpmnElement="Flow_108b5gn">
-        <di:waypoint x="880" y="347" />
-        <di:waypoint x="910" y="347" />
+        <di:waypoint x="850" y="347" />
+        <di:waypoint x="872" y="347" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_0e866cm_di" bpmnElement="Flow_0e866cm">
-        <di:waypoint x="1010" y="347" />
-        <di:waypoint x="1036" y="347" />
+        <di:waypoint x="1040" y="347" />
+        <di:waypoint x="1060" y="347" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Activity_12byjlx_di" bpmnElement="Activity_1mr3iz2">
+      <bpmndi:BPMNEdge id="Flow_1j2knps_di" bpmnElement="Flow_1j2knps">
+        <di:waypoint x="908" y="347" />
+        <di:waypoint x="940" y="347" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="Activity_12byjlx_di" bpmnElement="Activity_WS">
         <dc:Bounds x="86" y="200" width="100" height="80" />
         <bpmndi:BPMNLabel />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_00dksih_di" bpmnElement="Activity_0nhrtqc">
+      <bpmndi:BPMNShape id="Activity_00dksih_di" bpmnElement="Activity_Generate">
         <dc:Bounds x="236" y="200" width="100" height="80" />
         <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_13wjajq" bpmnElement="Event_Start">
+        <dc:Bounds x="2" y="222" width="36" height="36" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_1m6lop6_di" bpmnElement="Flow_1m6lop6">
         <di:waypoint x="186" y="240" />

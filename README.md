@@ -16,7 +16,9 @@ More tools used for the use-cases are the following:
 
 ### Consortial 2023 - Stuttgart
 
-### Workshop 2023 - Berlin
+### Workshop 2024 - Berlin
+
+In this workshop, a QuantME - Use-case is used to illustrate how to integrate the tools from PlanQK into the SeQuenC - Platform.
 
 ## Learn More
 
