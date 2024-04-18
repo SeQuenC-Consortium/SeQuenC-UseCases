@@ -1,6 +1,6 @@
 # BloQCat 2024 Tutorial
 
-## prerequisites
+## Prerequisites
 - [Install Docker](https://docs.docker.com/install/)
 - [Install Docker Compose](https://docs.docker.com/compose/install/)
 - [Install Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
