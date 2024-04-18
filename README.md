@@ -27,6 +27,10 @@ This use-case was shown in the Consortial meeting using a release version of Qun
 
 In this workshop, a QuantME - Use-case is used to illustrate how to integrate the tools from PlanQK into the SeQuenC - Platform.
 
+### BloqCat 2024 - Use-case
+
+The use-case shows the BloqCat framework which is used to create an executable solution by combining concrete solutions of patterns.
+
 ## Learn More
 
 - Georg, Daniel; Barzen, Johanna; Beisel, Martin; Leymann, Frank; Obst, Julian; Vietz, Daniel; Weder, Benjamin; Yussupov, Vladimir: [**Execution Patterns for Quantum Applications**](https://www.iaas.uni-stuttgart.de/publications/Georg2023_PatternsQuantumExecution.pdf). In: Proceedings of the 18th International Conference on Software Technologies - ICSOFT, SciTePress, 2023.
