@@ -4,6 +4,7 @@
 
 This project contains different use cases for the SeQuenC-platform.
 The main purpose is to show how the different components used in the SeQuenC-project interact with the unification-layer.
+Every Use-case is identified with a name, the purpose or a location and the year of creation.
 
 More tools used for the use-cases are the following:
 
@@ -12,9 +13,15 @@ More tools used for the use-cases are the following:
 
 ### Example 2023
 
+Provides an example workflow to get an overview of the used most tools used in the use-cases.
+
 ### Qunicorn 2023 - Use-cases
 
+A collection of use-cases using Qunicorn. These workflows illustrate the basic interactions with Qunicorn. The structure always follows the 3 steps: Deploy - Execute - Fetch Result.
+
 ### Consortial 2023 - Stuttgart
+
+This use-case was shown in the Consortial meeting using a release version of Qunicorn. The purpose was to show the progress and the functionality of Qunicorn.
 
 ### Workshop 2024 - Berlin
 
