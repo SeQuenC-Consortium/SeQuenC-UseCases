@@ -69,10 +69,11 @@ def execute_on_qunicorn(circuits, origin='http://localhost:8080'):
 
     # Payload dictionary for creating a job
     payload = { 
-      "name": "TestJob",
+      "name": "VQE_Batch_Job",
       "providerName": "IBM",
       "deviceName": "aer_simulator",
       "shots": 1000,
+      "errorMitigation": "none",
       "token": "",
       "type": "RUNNER",
       "deploymentId": deployment_id 
