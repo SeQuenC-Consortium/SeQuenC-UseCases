@@ -13,6 +13,7 @@ import numpy as np
 def ccz(targets=[0, 1, 2]):
     """
     implementation of three-qubit gate CCZ
+     **Not compatible with IBM**
     """
     # define three-qubit CCZ gate
     ccz_gate = np.array(
