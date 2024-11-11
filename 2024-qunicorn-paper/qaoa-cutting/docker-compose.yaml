@@ -11,6 +11,7 @@ services:
       DB_URL: "postgresql+psycopg://postgres:passwd@postgres/qunicorn"
       JWKS_URL: "http://keycloak:8080/auth/realms/qunicorn/protocol/openid-connect/certs"
       NUMBA_CACHE_DIR: "/app/cache"
+      CIRCUIT_CUTTING_URL: "http://cutting_service:5076"
     depends_on:
       - postgres
       - broker
@@ -31,6 +32,7 @@ services:
       NUMBA_CACHE_DIR: "/app/cache"
       # QMWARE_API_KEY: ""
       # QMWARE_API_KEY_ID: ""
+      CIRCUIT_CUTTING_URL: "http://cutting_service:5076"
     depends_on:
       - postgres
       - broker
@@ -102,6 +104,13 @@ services:
       - pgdata:/var/lib/postgresql/data \
     ports:
       - "5432:5432"
+
+  cutting_service:
+    image: planqk/circuit-cutting-service
+    networks:
+      - qunicorn
+    ports:
+      - "5076:5076"
 
   # QuilC and QVM Servers are commented out, as rigetti is an experimental feature and not running on docker.
   #quilc:

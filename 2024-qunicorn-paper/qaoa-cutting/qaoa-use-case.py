@@ -40,6 +40,7 @@ def qaoa_circuit(G: Graph):
   #qaoa_qc = transpile(qaoa_qc, basis_gates=['h', 'ry', 'rz', 'rx', 'cx'])
   qaoa_qc = transpile(qaoa_qc, basis_gates=['h', 'ry', 'rzz', 'rx', 'rz'])
 
+  print(qaoa_qc)
   return qaoa_qc
 
 
@@ -68,7 +69,7 @@ def execute_on_qunicorn(circuit, origin='http://localhost:8080'):
 
   payload = {
     "programs": programs,
-    "name": "VQEDeployment"
+    "name": "QAOADeployment"
   }
 
   # Send POST request to create a deployment
@@ -86,9 +87,11 @@ def execute_on_qunicorn(circuit, origin='http://localhost:8080'):
 
     # Payload dictionary for creating a job
     payload = { 
-      "name": "TestJob",
+      "name": "QAOA_Cutting_Job",
       "providerName": "IBM",
       "deviceName": "aer_simulator",
+      "errorMitigation": "none",
+      "cutToWidth": 3,
       "shots": 1000,
       "token": "",
       "type": "RUNNER",
@@ -103,7 +106,8 @@ def execute_on_qunicorn(circuit, origin='http://localhost:8080'):
 
 
   # get info of job
-  job_id = job_response.json()['id'] 
+  job_id = job_response.json()['id']
+  print(job_id)
   job_state = job_response.json()['state'] 
 
   while job_state in ["READY", "RUNNING"]:
@@ -155,7 +159,7 @@ def objective(x):
   return -energy
 
 
-# create VQE example
+# create QAOA example
 G = Graph(nodetype=int)
 G.add_edges_from([(0,1),(1,2),(1,3),(2,3),(3,4),(4,0)])
 param_circuit = qaoa_circuit(G)
