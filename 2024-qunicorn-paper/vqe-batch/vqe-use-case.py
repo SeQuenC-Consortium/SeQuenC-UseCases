@@ -21,6 +21,8 @@ pauli_lists = pauli_operator.paulis.group_commuting(qubit_wise=True)
 #print(pauli_lists)
 
 
+# circuits are hardcoded
+
 def create_circuits():
   problem_size = int(np.log2(len(operator_matrix)))
   ans = EfficientSU2(num_qubits=problem_size, reps=2)
